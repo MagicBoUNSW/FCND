@@ -49,23 +49,39 @@ And here is a lovely picture of our downtown San Francisco environment from abov
 ![Map of SF](./misc/map.png)
 
 #### 2. Set your current local position
-Here as long as you successfully determine your local position relative to global home you'll be all set. Explain briefly how you accomplished this in your code.
+The starter code assumed the drone takes off from map center, but the drone need to be able to takeoff from anywhere. 
 
+I retreived the drone's current position in geodetic coordinates from `self.global_position`, and the global home position set from last step from `self.global_home`, then used the utility function `global_to_local()` to convert the current global position to local position.
 
-Meanwhile, here's a picture of me flying through the trees!
-![Forest Flying](./misc/in_the_trees.png)
+I did this in [line 132](motion_planning.py#L132) of `motion_planning.py`.
+
 
 #### 3. Set grid start position from local position
-This is another step in adding flexibility to the start location. As long as it works you're good to go!
+The starter code hardcoded the map center as the start point for planning. To further enhance the flexibility to the start location, I changed this to be the current local position in [line 142 to 144](motion_planning.py#L142-L144) of `motion_planning.py`.
+
 
 #### 4. Set grid goal position from geodetic coords
-This step is to add flexibility to the desired goal location. Should be able to choose any (lat, lon) within the map and have it rendered to a goal location on the grid.
+The starter code hardcoded the goal position as some location 10 m north and 10 m east of map center. To add flexibility to the desired goal location, I modified the code in [line 148 to 151](motion_planning.py#L148-L151) of `motion_planning.py` to accept arbitrary goal postion on the grid given any geodetic coordinates. By defaults I set the coordinates to (longitude, latitude, altitude). 
+
+To assign the goal position, use command line arguments `goal_lon` for longitude, `goal_lat` for latitude, and `goal_alt` for altitude. For example:
+
+```
+python motion_planning.py --goal_lat 37.792945 --goal_lon -122.397513 --goal_alt 26
+``` 
 
 #### 5. Modify A* to include diagonal motion (or replace A* altogether)
-Minimal requirement here is to modify the code in planning_utils() to update the A* implementation to include diagonal motions on the grid that have a cost of sqrt(2), but more creative solutions are welcome. Explain the code you used to accomplish this step.
+I updated the A* implementation to include diagnoal motions on the grid that have a cost of sqrt(2). With diagnoal motions included, the jerky movement disappeared and the trajectories planned for the same goal changed. I did this in [lines 58 to 61](planning_utils.py#L58-L61), [91 to 98](planning_utils.py#L91-L98) of `planning_utils.py`.
+
+Here's a comparison between paths with and without diagonal motion:
+
+![alt text][image2]
 
 #### 6. Cull waypoints 
-For this step you can use a collinearity test or ray tracing method like Bresenham. The idea is simply to prune your path of unnecessary waypoints. Explain the code you used to accomplish this step.
+To prune the path of unnecessary waypoints, I implemented collinearity test in [lines 167 to 188](planning_utils.py#L167-L188) of `planning_utils.py` and applied it to the path obtained from A* search.
+
+Here's a comparison between paths before and after removing the unnecessary waypoints:
+
+![alt text][image3]
 
 
 
